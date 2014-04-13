@@ -31,7 +31,7 @@ void main() {
                   dot(position, vec3(0, -abs(normal.x+normal.z), normal.y)));
   
   //Compute tile coordinate
-  float tx    = attrib1.w / tileCount;
+  float tx    = (attrib1.z * 256.0 + attrib1.w) / tileCount; // 16-bit
   tileCoord.x = floor(tx);
   tileCoord.y = fract(tx) * tileCount;
   
