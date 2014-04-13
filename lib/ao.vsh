@@ -18,8 +18,13 @@ void main() {
   //Compute ambient occlusion
   ambientOcclusion = attrib0.w / 255.0;
   
-  //Compute normal
-  normal = 128.0 - attrib1.xyz;
+  //Extracted packed bits of normal. GLSL 1.0 doesn't support bitfieldExtract or even bitwise operations :(
+  int packedNormal = int(attrib1.x);
+  int nx = packedNormal / 16;               // xx____
+  int ny = packedNormal / 4 - nx * 4;       // __xx__
+  int nz = packedNormal - nx * 16 - ny * 4; // ____xx
+
+  normal = 128.0 - vec3(nx + 127, ny + 127, nz + 127);
   
   //Compute texture coordinate
   texCoord = vec2(dot(position, vec3(normal.y-normal.z, 0, normal.x)),
