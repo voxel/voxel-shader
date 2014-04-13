@@ -1,16 +1,15 @@
-ao-shader
-=========
-Shader for use with ao-mesher.
+voxel-shader
+============
+Shader for use with [voxel-mesher][https://github.com/deathcap/voxel-mesher].
 
-## Example
+Based on @mikolalysenko's [ao-shader](https://github.com/mikolalysenko/ao-shader)
 
-[Check it out in your browser.](http://mikolalysenko.github.io/ao-shader/index.html)
 
 ## Install
 
-    npm install ao-shader
+    npm install voxel-shader
     
-### `var shader = require("ao-shader")(gl)`
+### `var shader = require("voxel-shader")(gl)`
 Creates a shader in the WebGL context.
 
 * `gl` is the WebGL context to create the shader in
