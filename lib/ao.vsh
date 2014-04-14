@@ -1,5 +1,6 @@
 attribute vec4 attrib0;
 attribute vec4 attrib1;
+attribute vec4 attrib2;
 
 uniform mat4 projection;
 uniform mat4 view;
