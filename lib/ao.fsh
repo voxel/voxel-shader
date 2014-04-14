@@ -1,11 +1,11 @@
 precision highp float;
 
-uniform float tileSize;
 uniform sampler2D tileMap;
 uniform float tileCount;
 
 varying vec3  normal;
 varying vec2  tileCoord;
+varying float tileSize;
 varying vec2  texCoord;
 varying float ambientOcclusion;
 
@@ -15,8 +15,8 @@ void main() {
   vec4 color   = vec4(0,0,0,0);
   float weight = 0.0;
 
-  vec2 tileOffset = 2.0 * tileSize * tileCoord;
-  float denom     = 2.0 * tileSize * tileCount;
+  vec2 tileOffset = 2.0 * pow(2.0, 4.0) * tileCoord;
+  float denom     = 2.0 * pow(2.0, 4.0) * tileCount;
 
   for(int dx=0; dx<2; ++dx) {
     for(int dy=0; dy<2; ++dy) {

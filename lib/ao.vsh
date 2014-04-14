@@ -8,6 +8,7 @@ uniform float tileCount;
 
 varying vec3  normal;
 varying vec2  tileCoord;
+varying float tileSize;
 varying vec2  texCoord;
 varying float ambientOcclusion;
 
@@ -31,6 +32,7 @@ void main() {
                   dot(position, vec3(0, -abs(normal.x+normal.z), normal.y)));
   
   //Compute tile coordinate
+  tileSize    = pow(2.0, attrib1.y);
   float tx    = (attrib1.z * 256.0 + attrib1.w) / tileCount; // 16-bit
   tileCoord.x = floor(tx);
   tileCoord.y = fract(tx) * tileCount;
