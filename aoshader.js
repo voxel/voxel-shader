@@ -8,7 +8,7 @@ module.exports = function(game, opts) {
 };
 module.exports.pluginInfo = {
   clientOnly: true,
-  loadAfter: ['voxel-stitch'],
+  loadAfter: ['voxel-stitch', 'voxel-mesher'],
 };
 
 function ShaderPlugin(game, opts) {
@@ -16,6 +16,9 @@ function ShaderPlugin(game, opts) {
 
   this.stitcher = game.plugins.get('voxel-stitch');
   if (!this.stitcher) throw new Error('voxel-shader requires voxel-stitch plugin'); // for tileCount uniform and updateTexture event
+
+  this.mesher = game.plugins.get('voxel-mesher');
+  if (!this.mesher) throw new Error('voxel-shader requires voxel-mesher plugin'); // for meshes array TODO: ~ voxel module
 
   this.perspectiveResize = opts.perspectiveResize !== undefined ? opts.perspectiveResize : true;
 
@@ -82,8 +85,8 @@ ShaderPlugin.prototype.render = function() {
 
   if (this.texture) shader.uniforms.tileMap = this.texture.bind() // texture might not have loaded yet
 
-  for (var i = 0; i < this.shell.meshes.length; ++i) {
-    var mesh = this.shell.meshes[i];
+  for (var i = 0; i < this.mesher.meshes.length; ++i) {
+    var mesh = this.mesher.meshes[i];
     mesh.triangleVAO.bind()
     gl.drawArrays(gl.TRIANGLES, 0, mesh.triangleVertexCount)
     mesh.triangleVAO.unbind()
