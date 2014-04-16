@@ -81,8 +81,6 @@ ShaderPlugin.prototype.render = function() {
   shader.uniforms.model = this.modelMatrix
   shader.uniforms.tileCount = this.stitcher.tileCount
 
-  // TODO: relocate variables off of game.shell (texture, meshes)
-
   if (this.texture) shader.uniforms.tileMap = this.texture.bind() // texture might not have loaded yet
 
   for (var i = 0; i < this.mesher.meshes.length; ++i) {
