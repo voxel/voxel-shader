@@ -15,7 +15,7 @@ function ShaderPlugin(game, opts) {
   this.shell = game.shell;
 
   this.stitcher = game.plugins.get('voxel-stitch');
-  if (!this.stitcher) throw new Error('voxel-shader requires voxel-stitch plugin'); // for tileCount uniform below
+  if (!this.stitcher) throw new Error('voxel-shader requires voxel-stitch plugin'); // for tileCount uniform and updateTexture event
 
   this.perspectiveResize = opts.perspectiveResize !== undefined ? opts.perspectiveResize : true;
 
@@ -26,13 +26,19 @@ ShaderPlugin.prototype.enable = function() {
   this.shell.on('gl-init', this.onInit = this.ginit.bind(this));
   this.shell.on('gl-render', this.onRender = this.render.bind(this));
   if (this.perspectiveResize) this.shell.on('gl-resize', this.onResize = this.resize.bind(this));
+  this.stitcher.on('updateTexture', this.onUpdateTexture = this.updateTexture.bind(this));
 };
 
 ShaderPlugin.prototype.disable = function() {
   this.shell.removeListener('gl-init', this.onInit);
   this.shell.removeListener('gl-render', this.onRender);
   if (this.onResize) this.shell.removeListener('gl-resize', this.onResize);
+  this.stitcher.removeListener('updateTexture', this.onUpdateTexture);
 };
+
+ShaderPlugin.prototype.updateTexture = function(texture) {
+  this.texture = texture; // used in tileMap uniform
+}
 
 ShaderPlugin.prototype.ginit = function() {
   this.shader = this.createAOShader();
@@ -65,8 +71,7 @@ ShaderPlugin.prototype.render = function() {
 
   // TODO: relocate variables off of game.shell (texture, meshes)
 
-  var texture = this.stitcher.texture
-  if (texture) shader.uniforms.tileMap = texture.bind() // texture might not have loaded yet
+  if (this.texture) shader.uniforms.tileMap = this.texture.bind() // texture might not have loaded yet
 
   for (var i = 0; i < this.shell.meshes.length; ++i) {
     var mesh = this.shell.meshes[i];
