@@ -17,19 +17,21 @@ function ShaderPlugin(game, opts) {
   this.stitcher = game.plugins.get('voxel-stitch');
   if (!this.stitcher) throw new Error('voxel-shader requires voxel-stitch plugin'); // for tileCount uniform below
 
+  this.perspectiveResize = opts.perspectiveResize !== undefined ? opts.perspectiveResize : true;
+
   this.enable();
 }
 
 ShaderPlugin.prototype.enable = function() {
   this.shell.on('gl-init', this.onInit = this.ginit.bind(this));
   this.shell.on('gl-render', this.onRender = this.render.bind(this));
-  this.shell.on('gl-resize', this.onResize = this.resize.bind(this));
+  if (this.perspectiveResize) this.shell.on('gl-resize', this.onResize = this.resize.bind(this));
 };
 
 ShaderPlugin.prototype.disable = function() {
   this.shell.removeListener('gl-init', this.onInit);
   this.shell.removeListener('gl-render', this.onRender);
-  this.shell.removeListener('gl-resize', this.onResize);
+  if (this.onResize) this.shell.removeListener('gl-resize', this.onResize);
 };
 
 ShaderPlugin.prototype.ginit = function() {
