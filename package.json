@@ -7,13 +7,13 @@
     "example": "example"
   },
   "dependencies": {
+    "gl-matrix": "~2.0.0",
     "gl-shader": "~0.0.5",
     "brfs": "~0.0.5"
   },
   "devDependencies": {
     "ao-mesher": "~0.2.4",
     "ndarray": "~1.0.1",
-    "gl-matrix": "~2.0.0",
     "gl-vao": "0.0.2",
     "gl-buffer": "~0.1.0",
     "gl-now": "~0.0.4",
