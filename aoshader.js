@@ -23,29 +23,30 @@ function ShaderPlugin(game, opts) {
 ShaderPlugin.prototype.enable = function() {
   this.shell.on('gl-init', this.onInit = this.ginit.bind(this));
   this.shell.on('gl-render', this.onRender = this.render.bind(this));
+  this.shell.on('gl-resize', this.onResize = this.resize.bind(this));
 };
 
 ShaderPlugin.prototype.disable = function() {
   this.shell.removeListener('gl-init', this.onInit);
   this.shell.removeListener('gl-render', this.onRender);
+  this.shell.removeListener('gl-resize', this.onResize);
 };
 
 ShaderPlugin.prototype.ginit = function() {
   this.shader = this.createAOShader();
+  this.resize();
+  this.modelMatrix = mat4.identity(new Float32Array(16)) // TODO: merge with view into modelView? or leave for flexibility?
+};
+
+ShaderPlugin.prototype.resize = function() {
+  //Calculation projection matrix
+  this.projectionMatrix = mat4.perspective(new Float32Array(16), Math.PI/4.0, this.shell.width/this.shell.height, 1.0, 1000.0)
 };
 
 ShaderPlugin.prototype.render = function() {
   var gl = this.shell.gl
 
-  //Calculation projection matrix
-  var projection = mat4.perspective(new Float32Array(16), Math.PI/4.0, this.shell.width/this.shell.height, 1.0, 1000.0) // TODO: only update on resize event
-  var model = mat4.identity(new Float32Array(16)) // TODO: move out of loop. or merge to modelView?
-  var view = this.shell.camera.view() // TODO: expose camera through a plugin instead?
-
-  // for voxel-wireframe rendering TODO: refactor
-  this.projection = projection
-  this.model = model
-  this.view = view
+  this.viewMatrix = this.shell.camera.view() // TODO: expose camera through a plugin instead?
 
   gl.enable(gl.CULL_FACE)
   gl.enable(gl.DEPTH_TEST)
@@ -55,9 +56,9 @@ ShaderPlugin.prototype.render = function() {
   shader.bind()
   shader.attributes.attrib0.location = 0
   shader.attributes.attrib1.location = 1
-  shader.uniforms.projection = projection
-  shader.uniforms.view = view
-  shader.uniforms.model = model
+  shader.uniforms.projection = this.projectionMatrix
+  shader.uniforms.view = this.viewMatrix
+  shader.uniforms.model = this.modelMatrix
   shader.uniforms.tileCount = this.stitcher.tileCount
 
   // TODO: relocate variables off of game.shell (texture, meshes)
