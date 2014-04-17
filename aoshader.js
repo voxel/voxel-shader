@@ -8,7 +8,7 @@ module.exports = function(game, opts) {
 };
 module.exports.pluginInfo = {
   clientOnly: true,
-  loadAfter: ['voxel-stitch', 'voxel-mesher'],
+  loadAfter: ['voxel-stitch', 'voxel-mesher', 'voxel-camera'],
 };
 
 function ShaderPlugin(game, opts) {
@@ -19,6 +19,9 @@ function ShaderPlugin(game, opts) {
 
   this.mesher = game.plugins.get('voxel-mesher');
   if (!this.mesher) throw new Error('voxel-shader requires voxel-mesher plugin'); // for meshes array TODO: ~ voxel module
+
+  this.camera = game.plugins.get('voxel-camera');
+  if (!this.camera) throw new Error('voxel-shader requires voxel-camera plugin'); // for camera view matrix
 
   this.perspectiveResize = opts.perspectiveResize !== undefined ? opts.perspectiveResize : true;
 
@@ -46,6 +49,7 @@ ShaderPlugin.prototype.updateTexture = function(texture) {
 ShaderPlugin.prototype.ginit = function() {
   this.shader = this.createAOShader();
   this.resize();
+  this.viewMatrix = mat4.create();
   this.modelMatrix = mat4.identity(new Float32Array(16)) // TODO: merge with view into modelView? or leave for flexibility?
 };
 
@@ -57,7 +61,7 @@ ShaderPlugin.prototype.resize = function() {
 ShaderPlugin.prototype.render = function() {
   var gl = this.shell.gl
 
-  this.viewMatrix = this.shell.camera.view() // TODO: expose camera through a plugin instead?
+  this.camera.view(this.viewMatrix)
 
   gl.enable(gl.CULL_FACE)
   gl.enable(gl.DEPTH_TEST)
