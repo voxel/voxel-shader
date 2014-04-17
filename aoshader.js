@@ -8,7 +8,7 @@ module.exports = function(game, opts) {
 };
 module.exports.pluginInfo = {
   clientOnly: true,
-  loadAfter: ['voxel-stitch', 'voxel-mesher', 'voxel-camera'],
+  loadAfter: ['voxel-stitch', 'voxel-mesher', 'game-shell-fps-camera'],
 };
 
 function ShaderPlugin(game, opts) {
@@ -20,8 +20,8 @@ function ShaderPlugin(game, opts) {
   this.mesher = game.plugins.get('voxel-mesher');
   if (!this.mesher) throw new Error('voxel-shader requires voxel-mesher plugin'); // for meshes array TODO: ~ voxel module
 
-  this.camera = game.plugins.get('voxel-camera');
-  if (!this.camera) throw new Error('voxel-shader requires voxel-camera plugin'); // for camera view matrix
+  this.camera = game.plugins.get('game-shell-fps-camera');
+  if (!this.camera) throw new Error('voxel-shader requires game-shell-fps-camera plugin'); // for camera view matrix
 
   this.perspectiveResize = opts.perspectiveResize !== undefined ? opts.perspectiveResize : true;
 
