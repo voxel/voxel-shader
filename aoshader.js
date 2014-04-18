@@ -77,6 +77,7 @@ ShaderPlugin.prototype.render = function() {
 
   //Bind the shader
   var shader = this.shader
+  if (!shader) throw new Error('voxel-shader render() called before gl-init, shader=', this.shader)
   shader.bind()
   shader.attributes.attrib0.location = 0
   shader.attributes.attrib1.location = 1
