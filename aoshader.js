@@ -8,7 +8,7 @@ module.exports = function(game, opts) {
 };
 module.exports.pluginInfo = {
   clientOnly: true,
-  loadAfter: ['voxel-stitch', 'voxel-mesher', 'game-shell-fps-camera'],
+  loadAfter: ['voxel-stitch', 'game-shell-fps-camera'],
 };
 
 function ShaderPlugin(game, opts) {
@@ -17,8 +17,8 @@ function ShaderPlugin(game, opts) {
   this.stitcher = game.plugins.get('voxel-stitch');
   if (!this.stitcher) throw new Error('voxel-shader requires voxel-stitch plugin'); // for tileCount uniform and updateTexture event
 
-  this.mesher = game.plugins.get('voxel-mesher');
-  if (!this.mesher) throw new Error('voxel-shader requires voxel-mesher plugin'); // for meshes array TODO: ~ voxel module
+  this.meshes = opts.meshes
+  if (!this.meshes) throw new Error('voxel-shader requires "meshes" option set to array of voxel-mesher meshes')
 
   this.camera = game.plugins.get('game-shell-fps-camera');
   if (!this.camera) throw new Error('voxel-shader requires game-shell-fps-camera plugin'); // for camera view matrix
@@ -86,8 +86,8 @@ ShaderPlugin.prototype.render = function() {
 
   if (this.texture) shader.uniforms.tileMap = this.texture.bind() // texture might not have loaded yet
 
-  for (var i = 0; i < this.mesher.meshes.length; ++i) {
-    var mesh = this.mesher.meshes[i];
+  for (var chunkIndex in this.meshes) {
+    var mesh = this.meshes[chunkIndex]
     shader.uniforms.model = mesh.modelMatrix
     mesh.triangleVAO.bind()
     gl.drawArrays(gl.TRIANGLES, 0, mesh.triangleVertexCount)
