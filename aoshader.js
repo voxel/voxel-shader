@@ -50,7 +50,6 @@ ShaderPlugin.prototype.ginit = function() {
   this.shader = this.createAOShader();
   this.resize();
   this.viewMatrix = mat4.create();
-  this.modelMatrix = mat4.identity(new Float32Array(16)) // TODO: merge with view into modelView? or leave for flexibility?
 };
 
 ShaderPlugin.prototype.resize = function() {
@@ -83,13 +82,13 @@ ShaderPlugin.prototype.render = function() {
   shader.attributes.attrib1.location = 1
   shader.uniforms.projection = this.projectionMatrix
   shader.uniforms.view = this.viewMatrix
-  shader.uniforms.model = this.modelMatrix
   shader.uniforms.tileCount = this.stitcher.tileCount
 
   if (this.texture) shader.uniforms.tileMap = this.texture.bind() // texture might not have loaded yet
 
   for (var i = 0; i < this.mesher.meshes.length; ++i) {
     var mesh = this.mesher.meshes[i];
+    shader.uniforms.model = mesh.modelMatrix
     mesh.triangleVAO.bind()
     gl.drawArrays(gl.TRIANGLES, 0, mesh.triangleVertexCount)
     mesh.triangleVAO.unbind()
