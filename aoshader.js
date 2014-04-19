@@ -17,8 +17,8 @@ function ShaderPlugin(game, opts) {
   this.stitcher = game.plugins.get('voxel-stitch');
   if (!this.stitcher) throw new Error('voxel-shader requires voxel-stitch plugin'); // for tileCount uniform and updateTexture event
 
-  this.meshes = opts.meshes
-  if (!this.meshes) throw new Error('voxel-shader requires "meshes" option set to array of voxel-mesher meshes')
+  this.meshes = opts.meshes || game.voxels.meshes
+  if (!this.meshes) throw new Error('voxel-shader requires "meshes" option or game.voxels.meshes set to array of voxel-mesher meshes')
 
   this.camera = game.plugins.get('game-shell-fps-camera');
   if (!this.camera) throw new Error('voxel-shader requires game-shell-fps-camera plugin'); // for camera view matrix
