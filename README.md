@@ -1,6 +1,6 @@
 voxel-shader
 ============
-Shader for use with [voxel-mesher][https://github.com/deathcap/voxel-mesher].
+Shader for use with [voxel-mesher](https://github.com/deathcap/voxel-mesher).
 
 Based on @mikolalysenko's [ao-shader](https://github.com/mikolalysenko/ao-shader)
 
