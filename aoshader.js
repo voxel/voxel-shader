@@ -84,14 +84,16 @@ ShaderPlugin.prototype.render = function() {
   shader.uniforms.view = this.viewMatrix
   shader.uniforms.tileCount = this.stitcher.tileCount
 
-  if (this.texture) shader.uniforms.tileMap = this.texture.bind() // texture might not have loaded yet
+  if (this.texture) shader.uniforms.tileMap = this.texture.bind() // if a texture is loaded
 
   for (var chunkIndex in this.meshes) {
     var mesh = this.meshes[chunkIndex]
-    shader.uniforms.model = mesh.modelMatrix
-    mesh.triangleVAO.bind()
-    gl.drawArrays(gl.TRIANGLES, 0, mesh.triangleVertexCount)
-    mesh.triangleVAO.unbind()
+    if (mesh.triangleVertexCount) {  // if there are triangles to render
+      shader.uniforms.model = mesh.modelMatrix
+      mesh.triangleVAO.bind()
+      gl.drawArrays(gl.TRIANGLES, 0, mesh.triangleVertexCount)
+      mesh.triangleVAO.unbind()
+    }
   }
 };
 
