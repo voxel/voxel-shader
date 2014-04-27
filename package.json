@@ -1,6 +1,6 @@
 {
   "name": "voxel-shader",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "description": "Ambient occlusion capable shader for ao-mesher",
   "main": "aoshader.js",
   "directories": {
