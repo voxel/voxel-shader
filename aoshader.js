@@ -88,11 +88,12 @@ ShaderPlugin.prototype.render = function() {
 
   for (var chunkIndex in this.meshes) {
     var mesh = this.meshes[chunkIndex]
-    if (mesh.triangleVAO) {  // if there are triangles to render
+    var triangleVAO = mesh.vertexArrayObjects.surface
+    if (triangleVAO) {  // if there are triangles to render
       shader.uniforms.model = mesh.modelMatrix
-      mesh.triangleVAO.bind()
-      gl.drawArrays(gl.TRIANGLES, 0, mesh.triangleVAO.length)
-      mesh.triangleVAO.unbind()
+      triangleVAO.bind()
+      gl.drawArrays(gl.TRIANGLES, 0, triangleVAO.length)
+      triangleVAO.unbind()
     }
   }
 };
