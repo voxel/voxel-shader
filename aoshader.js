@@ -24,7 +24,11 @@ function ShaderPlugin(game, opts) {
   if (!this.camera) throw new Error('voxel-shader requires game-shell-fps-camera plugin'); // for camera view matrix
 
   this.perspectiveResize = opts.perspectiveResize !== undefined ? opts.perspectiveResize : true;
-  this.projectionMatrix = mat4.create()
+  this.cameraNear = opts.cameraNear !== undefined ? opts.cameraNear : 1.0;
+  this.cameraFar = opts.cameraFar !== undefined ? opts.cameraFar : 1000.0;
+  this.cameraFOV = opts.cameraFOV !== undefined ? (opts.cameraFOV*Math.PI/180) : (Math.PI / 4.0);
+
+  this.projectionMatrix = mat4.create();
 
   this.enable();
 }
@@ -54,7 +58,7 @@ ShaderPlugin.prototype.ginit = function() {
 };
 
 ShaderPlugin.prototype.updateProjectionMatrix = function() {
-  mat4.perspective(this.projectionMatrix, Math.PI/4.0, this.shell.width/this.shell.height, 1.0, 1000.0)
+  mat4.perspective(this.projectionMatrix, this.cameraFOV, this.shell.width/this.shell.height, this.cameraNear, this.cameraFar)
 };
 
 ShaderPlugin.prototype.render = function() {
