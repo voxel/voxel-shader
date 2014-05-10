@@ -24,6 +24,7 @@ function ShaderPlugin(game, opts) {
   if (!this.camera) throw new Error('voxel-shader requires game-shell-fps-camera plugin'); // for camera view matrix
 
   this.perspectiveResize = opts.perspectiveResize !== undefined ? opts.perspectiveResize : true;
+  this.projectionMatrix = mat4.create()
 
   this.enable();
 }
@@ -31,7 +32,7 @@ function ShaderPlugin(game, opts) {
 ShaderPlugin.prototype.enable = function() {
   this.shell.on('gl-init', this.onInit = this.ginit.bind(this));
   this.shell.on('gl-render', this.onRender = this.render.bind(this));
-  if (this.perspectiveResize) this.shell.on('gl-resize', this.onResize = this.resize.bind(this));
+  if (this.perspectiveResize) this.shell.on('gl-resize', this.onResize = this.updateProjectionMatrix.bind(this));
   this.stitcher.on('updateTexture', this.onUpdateTexture = this.updateTexture.bind(this));
 };
 
@@ -48,13 +49,12 @@ ShaderPlugin.prototype.updateTexture = function(texture) {
 
 ShaderPlugin.prototype.ginit = function() {
   this.shader = this.createAOShader();
-  this.resize();
+  this.updateProjectionMatrix();
   this.viewMatrix = mat4.create();
 };
 
-ShaderPlugin.prototype.resize = function() {
-  //Calculation projection matrix
-  this.projectionMatrix = mat4.perspective(new Float32Array(16), Math.PI/4.0, this.shell.width/this.shell.height, 1.0, 1000.0)
+ShaderPlugin.prototype.updateProjectionMatrix = function() {
+  mat4.perspective(this.projectionMatrix, Math.PI/4.0, this.shell.width/this.shell.height, 1.0, 1000.0)
 };
 
 ShaderPlugin.prototype.render = function() {
