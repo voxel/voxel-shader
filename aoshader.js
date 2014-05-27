@@ -25,7 +25,7 @@ function ShaderPlugin(game, opts) {
 
   this.perspectiveResize = opts.perspectiveResize !== undefined ? opts.perspectiveResize : true;
   this.cameraNear = opts.cameraNear !== undefined ? opts.cameraNear : 0.1;
-  this.cameraFar = opts.cameraFar !== undefined ? opts.cameraFar : 100.0;
+  this.cameraFar = opts.cameraFar !== undefined ? opts.cameraFar : 200.0;
   this.cameraFOV = opts.cameraFOV !== undefined ? opts.cameraFOV : 45.0;
 
   this.projectionMatrix = mat4.create();
