@@ -24,8 +24,8 @@ function ShaderPlugin(game, opts) {
   if (!this.camera) throw new Error('voxel-shader requires game-shell-fps-camera plugin'); // for camera view matrix
 
   this.perspectiveResize = opts.perspectiveResize !== undefined ? opts.perspectiveResize : true;
-  this.cameraNear = opts.cameraNear !== undefined ? opts.cameraNear : 1.0;
-  this.cameraFar = opts.cameraFar !== undefined ? opts.cameraFar : 1000.0;
+  this.cameraNear = opts.cameraNear !== undefined ? opts.cameraNear : 0.1;
+  this.cameraFar = opts.cameraFar !== undefined ? opts.cameraFar : 100.0;
   this.cameraFOV = opts.cameraFOV !== undefined ? opts.cameraFOV : 45.0;
 
   this.projectionMatrix = mat4.create();
