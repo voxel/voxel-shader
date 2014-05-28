@@ -12,6 +12,16 @@ varying float tileSize;
 varying vec2  texCoord;
 varying float ambientOcclusion;
 
+mat4 translate(float x, float y, float z) { // TODO: @import glslify? same as in avatar
+    return mat4(1.0, 0.0, 0.0, 0.0,
+                0.0, 1.0, 0.0, 0.0,
+                0.0, 0.0, 1.0, 0.0,
+                  x,   y,   z, 1.0);
+}
+
+// Offset to account for air padding (separate from other matrices so they can be reused)
+mat4 shift = translate(-1.0, -1.0, -1.0);
+
 void main() {
   //Compute position
   vec3 position = attrib0.xyz;
@@ -37,5 +47,5 @@ void main() {
   tileCoord.x = floor(tx);
   tileCoord.y = fract(tx) * tileCount;
   
-  gl_Position = projection * view * model * vec4(position, 1.0);
+  gl_Position = projection * view * model * shift * vec4(position, 1.0);
 }
