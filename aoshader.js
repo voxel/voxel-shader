@@ -1,3 +1,4 @@
+var glslify = require("glslify")
 var fs = require("fs")
 var createShader = require("gl-shader")
 
@@ -103,7 +104,8 @@ ShaderPlugin.prototype.render = function() {
 };
 
 ShaderPlugin.prototype.createAOShader = function() {
-  return createShader(this.shell.gl,
-    fs.readFileSync(__dirname+"/lib/ao.vsh"),
-    fs.readFileSync(__dirname+"/lib/ao.fsh"))
-};
+  return glslify({
+    vertex: './lib/ao.vsh',
+    fragment: './lib/ao.fsh'
+  })(this.shell.gl)
+}
