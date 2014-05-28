@@ -1,6 +1,5 @@
 var glslify = require("glslify")
 var fs = require("fs")
-var createShader = require("gl-shader")
 
 var mat4 = require('gl-matrix').mat4
 
