@@ -1,14 +1,16 @@
 var shell = require("gl-now")()
 var camera = require("game-shell-orbit-camera")(shell)
-var createTileMap = require("gl-tile-map")
 var createBuffer = require("gl-buffer")
 var createVAO = require("gl-vao")
 var ndarray = require("ndarray")
 var fill = require("ndarray-fill")
 var ops = require("ndarray-ops")
-var terrain = require("isabella-texture-pack")
-var createAOMesh = require("ao-mesher")
-var createAOShader = require("../aoshader.js")
+var createPlugins = require("voxel-plugins")
+require("../aoshader.js")
+require("voxel-stitch")
+require("voxel-registry")
+require("voxel-mesher")
+require("game-shell-fps-camera")
 var glm = require("gl-matrix")
 var mat4 = glm.mat4
 
@@ -37,7 +39,15 @@ shell.on("gl-init", function() {
   var gl = shell.gl
 
   //Create shader
-  shader = createAOShader(gl)
+  var plugins = createPlugins({shell: shell, isClient: true}, {require:require})
+  plugins.add("../aoshader.js", {meshes: []}) // TODO: add meshes
+  plugins.add("voxel-stitch", {})
+  plugins.add("voxel-registry", {})
+  plugins.add("voxel-mesher", {})
+  plugins.add("game-shell-fps-camera", {})
+  plugins.loadAll()
+ 
+  shader = plugins.get("../aoshader.js").createAOShader()
   
   //Create some voxels
   var voxels = ndarray(new Int32Array(resolution[0]*resolution[1]*resolution[2]),
@@ -49,7 +59,7 @@ shell.on("gl-init", function() {
   camera.lookAt([c[0], c[1], c[2]+2*resolution[2]], c, [0,1,0])
   
   //Compute mesh
-  var vert_data = createAOMesh(voxels)
+  var vert_data = createAOMesh(voxels) // TODO
   
   //Convert mesh to WebGL buffer
   vertexCount = vert_data.length>>3
@@ -70,13 +80,6 @@ shell.on("gl-init", function() {
       "normalized": false
     }
   ])
-  
-  //Load texture map
-  var tiles = ndarray(terrain.data,
-    [16,16,terrain.shape[0]>>4,terrain.shape[1]>>4,4],
-    [terrain.stride[0]*16, terrain.stride[1]*16, terrain.stride[0], terrain.stride[1], terrain.stride[2]], 0)
-  texture = createTileMap(gl, tiles, true)
-  texture.mipSamples = 4
 })
 
 shell.on("gl-render", function(t) {
