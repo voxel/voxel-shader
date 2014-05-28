@@ -3,28 +3,9 @@
   "version": "0.11.0",
   "description": "Ambient occlusion capable shader for voxel-mesher",
   "main": "aoshader.js",
-  "directories": {
-    "example": "example"
-  },
   "dependencies": {
     "gl-matrix": "^2.2.1",
     "glslify": "^1.3.0"
-  },
-  "devDependencies": {
-    "ndarray": "^1.0.15",
-    "gl-vao": "^1.1.2",
-    "gl-buffer": "^2.0.6",
-    "gl-now": "^1.3.1",
-    "ndarray-fill": "^1.0.1",
-    "ndarray-ops": "^1.2.2",
-    "gl-texture2d": "^1.0.1",
-    "gl-tile-map": "^0.3.0",
-    "game-shell-orbit-camera": "^1.0.0",
-    "voxel-stitch": "^0.7.1",
-    "voxel-plugins": "^0.3.0",
-    "voxel-registry": "^0.6.0",
-    "voxel-mesher": "^0.11.0",
-    "game-shell-fps-camera": "^0.4.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -35,6 +16,7 @@
   },
   "keywords": [
     "voxel",
+    "plugins",
     "ambient",
     "occlusion",
     "shader",
