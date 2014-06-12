@@ -58,8 +58,10 @@ ShaderPlugin.prototype.ginit = function() {
   this.updateProjectionMatrix();
   this.viewMatrix = mat4.create();
 
-  this.customGeomTest = createBlockGeometry(this.shell.gl, [
-    {from: [0,0,0],
+  var stitcher = this.stitcher;
+
+  this.customGeomTest = createBlockGeometry(this.shell.gl,
+    [{from: [0,0,0],
     to: [16,16,16],
     faceData: {
       down: {},
@@ -68,8 +70,14 @@ ShaderPlugin.prototype.ginit = function() {
       south: {},
       west: {},
       east: {}},
+    texture: 'furnace_front_on',
+    }],
+    //getTextureUV:
+    function(name) {
+      return [ [0,0], [0,1], [1,1], [1,0] ]
+      //return stitcher.getTextureUV(name); // TODO
     }
-  ]);
+  );
 };
 
 ShaderPlugin.prototype.updateProjectionMatrix = function() {
@@ -118,13 +126,16 @@ ShaderPlugin.prototype.render = function() {
 
   // second pass - custom block models
   var shader2 = this.shader2
-  this.customGeomTest.bind(shader2)
+  shader2.bind()
   shader2.attributes.position.location = 0
-  shader2.uniforms.uView = this.viewMatrix
+  shader2.uniforms.view = this.viewMatrix
   var modelMatrix = mat4.create()
-  shader2.uniforms.uModel = modelMatrix
-  shader2.uniforms.uProjection = this.projectionMatrix
-  this.customGeomTest.draw()
+  shader2.uniforms.model = modelMatrix
+  shader2.uniforms.projection = this.projectionMatrix
+  if (this.texture) shader2.uniforms.texture = this.texture.bind()
+
+  this.customGeomTest.bind()
+  this.customGeomTest.draw(gl.TRIANGLES, this.customGeomTest.length)
   this.customGeomTest.unbind()
 };
 
@@ -136,37 +147,30 @@ ShaderPlugin.prototype.createAOShader = function() {
 };
 
 ShaderPlugin.prototype.createCustomModelShader = function() {
-  return glslify({ // TODO: move to files
-      inline: true,
-         // example shader based on gl-geometry demo for testing
-      vert: '\
-precision mediump float;\
-\
+  // TODO: refactor with voxel-decals, voxel-chunkborder?
+  return glslify({
+   inline: true,
+    vertex: "\
 attribute vec3 position;\
-attribute vec3 normal;\
-varying vec3 vnormal;\
-uniform mat4 uProjection;\
-uniform mat4 uView;\
-uniform mat4 uModel;\
+attribute vec2 uv;\
+\
+uniform mat4 projection;\
+uniform mat4 view;\
+uniform mat4 model;\
+varying vec2 vUv;\
 \
 void main() {\
-  vnormal = (uView * vec4(normal, 1.0)).xyz / 2.0 + 0.5;\
+  gl_Position = projection * view * model * vec4(position, 1.0);\
+  vUv = uv;\
+}",
+
+  fragment: "\
+precision highp float;\
 \
-  gl_Position = (\
-      uProjection\
-    * uView\
-    * uModel\
-    * vec4(position, 1.0)\
-  );\
-}'
-// TODO: textures, UVs
-    , frag: '\
-precision mediump float;\
-\
-varying vec3 vnormal;\
+uniform sampler2D texture;\
+varying vec2 vUv;\
 \
 void main() {\
-  gl_FragColor = vec4(vnormal, 1.0);\
-}'
-  })(this.shell.gl)
+  gl_FragColor = texture2D(texture, vUv);\
+}"})(this.shell.gl);
 };
