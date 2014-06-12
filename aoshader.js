@@ -39,6 +39,7 @@ ShaderPlugin.prototype.enable = function() {
   this.shell.on('gl-render', this.onRender = this.render.bind(this));
   if (this.perspectiveResize) this.shell.on('gl-resize', this.onResize = this.updateProjectionMatrix.bind(this));
   this.stitcher.on('updateTexture', this.onUpdateTexture = this.texturesReady.bind(this));
+  this.stitcher.preloadTexture('glass_blue');
 };
 
 ShaderPlugin.prototype.disable = function() {
@@ -54,16 +55,17 @@ ShaderPlugin.prototype.texturesReady = function(texture) {
   var stitcher = this.stitcher;
 
   this.customGeomTest = createBlockGeometry(this.shell.gl,
-    [{from: [0,0,0],
-    to: [16,16,16],
+    [{from: [0,16,0],
+    to: [0,16,16], // TODO: on ground surface
     faceData: {
       down: {},
       up: {},
-      north: {},
-      south: {},
-      west: {},
-      east: {}},
-    texture: 'furnace_front_on',
+      //north: {},
+      //south: {},
+      //west: {},
+      //east: {}
+      },
+    texture: 'glass_blue',
     }],
     //getTextureUV:
     function(name) {
