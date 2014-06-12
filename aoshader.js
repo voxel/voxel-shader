@@ -1,5 +1,6 @@
 var glslify = require("glslify")
 var fs = require("fs")
+var createBlockGeometry = require("block-models")
 
 var mat4 = require('gl-matrix').mat4
 
@@ -53,8 +54,22 @@ ShaderPlugin.prototype.updateTexture = function(texture) {
 
 ShaderPlugin.prototype.ginit = function() {
   this.shader = this.createAOShader();
+  this.shader2 = this.createCustomModelShader();
   this.updateProjectionMatrix();
   this.viewMatrix = mat4.create();
+
+  this.customGeomTest = createBlockGeometry(this.shell.gl, [
+    {from: [0,0,0],
+    to: [16,16,16],
+    faceData: {
+      down: {},
+      up: {},
+      north: {},
+      south: {},
+      west: {},
+      east: {}},
+    }
+  ]);
 };
 
 ShaderPlugin.prototype.updateProjectionMatrix = function() {
@@ -100,6 +115,17 @@ ShaderPlugin.prototype.render = function() {
       triangleVAO.unbind()
     }
   }
+
+  // second pass - custom block models
+  var shader2 = this.shader2
+  this.customGeomTest.bind(shader2)
+  shader2.attributes.position.location = 0
+  shader2.uniforms.uView = this.viewMatrix
+  var modelMatrix = mat4.create()
+  shader2.uniforms.uModel = modelMatrix
+  shader2.uniforms.uProjection = this.projectionMatrix
+  this.customGeomTest.draw()
+  this.customGeomTest.unbind()
 };
 
 ShaderPlugin.prototype.createAOShader = function() {
@@ -107,4 +133,40 @@ ShaderPlugin.prototype.createAOShader = function() {
     vertex: './lib/ao.vsh',
     fragment: './lib/ao.fsh'
   })(this.shell.gl)
-}
+};
+
+ShaderPlugin.prototype.createCustomModelShader = function() {
+  return glslify({ // TODO: move to files
+      inline: true,
+         // example shader based on gl-geometry demo for testing
+      vert: '\
+precision mediump float;\
+\
+attribute vec3 position;\
+attribute vec3 normal;\
+varying vec3 vnormal;\
+uniform mat4 uProjection;\
+uniform mat4 uView;\
+uniform mat4 uModel;\
+\
+void main() {\
+  vnormal = (uView * vec4(normal, 1.0)).xyz / 2.0 + 0.5;\
+\
+  gl_Position = (\
+      uProjection\
+    * uView\
+    * uModel\
+    * vec4(position, 1.0)\
+  );\
+}'
+// TODO: textures, UVs
+    , frag: '\
+precision mediump float;\
+\
+varying vec3 vnormal;\
+\
+void main() {\
+  gl_FragColor = vec4(vnormal, 1.0);\
+}'
+  })(this.shell.gl)
+};
