@@ -38,7 +38,7 @@ ShaderPlugin.prototype.enable = function() {
   this.shell.on('gl-init', this.onInit = this.ginit.bind(this));
   this.shell.on('gl-render', this.onRender = this.render.bind(this));
   if (this.perspectiveResize) this.shell.on('gl-resize', this.onResize = this.updateProjectionMatrix.bind(this));
-  this.stitcher.on('updateTexture', this.onUpdateTexture = this.updateTexture.bind(this));
+  this.stitcher.on('updateTexture', this.onUpdateTexture = this.texturesReady.bind(this));
 };
 
 ShaderPlugin.prototype.disable = function() {
@@ -48,15 +48,8 @@ ShaderPlugin.prototype.disable = function() {
   this.stitcher.removeListener('updateTexture', this.onUpdateTexture);
 };
 
-ShaderPlugin.prototype.updateTexture = function(texture) {
+ShaderPlugin.prototype.texturesReady = function(texture) {
   this.texture = texture; // used in tileMap uniform
-}
-
-ShaderPlugin.prototype.ginit = function() {
-  this.shader = this.createAOShader();
-  this.shader2 = this.createCustomModelShader();
-  this.updateProjectionMatrix();
-  this.viewMatrix = mat4.create();
 
   var stitcher = this.stitcher;
 
@@ -74,10 +67,18 @@ ShaderPlugin.prototype.ginit = function() {
     }],
     //getTextureUV:
     function(name) {
-      return [ [0,0], [0,1], [1,1], [1,0] ]
-      //return stitcher.getTextureUV(name); // TODO
+      return stitcher.getTextureUV(name); // only available when textures are ready
     }
   );
+
+}
+
+ShaderPlugin.prototype.ginit = function() {
+  this.shader = this.createAOShader();
+  this.shader2 = this.createCustomModelShader();
+  this.updateProjectionMatrix();
+  this.viewMatrix = mat4.create();
+
 };
 
 ShaderPlugin.prototype.updateProjectionMatrix = function() {
@@ -134,9 +135,11 @@ ShaderPlugin.prototype.render = function() {
   shader2.uniforms.projection = this.projectionMatrix
   if (this.texture) shader2.uniforms.texture = this.texture.bind()
 
-  this.customGeomTest.bind()
-  this.customGeomTest.draw(gl.TRIANGLES, this.customGeomTest.length)
-  this.customGeomTest.unbind()
+  if (this.customGeomTest) {
+    this.customGeomTest.bind()
+    this.customGeomTest.draw(gl.TRIANGLES, this.customGeomTest.length)
+    this.customGeomTest.unbind()
+  }
 };
 
 ShaderPlugin.prototype.createAOShader = function() {
