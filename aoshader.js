@@ -53,22 +53,21 @@ ShaderPlugin.prototype.texturesReady = function(texture) {
   this.texture = texture; // used in tileMap uniform
 
   this.setTestGeom(
-    [{from: [8,16,0],
-    to: [0,16,16], // TODO: on ground surface
+    [{from: [0,0,0],
+    to: [16,1,16],
     faceData: {
       down: {},
       up: {},
-      //north: {},
-      //south: {},
-      //west: {},
-      //east: {}
+      north: {},
+      south: {},
+      west: {},
+      east: {}
       },
     texture: 'glass_blue',
     }]);
 }
 
 ShaderPlugin.prototype.setTestGeom = function(model) {
-  var stitcher = this.stitcher;
   var stitcher = this.stitcher;
   this.customGeomTest = createBlockGeometry(
     this.shell.gl,
