@@ -53,7 +53,7 @@ ShaderPlugin.prototype.texturesReady = function(texture) {
   this.texture = texture; // used in tileMap uniform
 
   this.setTestGeom(
-    [{from: [0,16,0],
+    [{from: [8,16,0],
     to: [0,16,16], // TODO: on ground surface
     faceData: {
       down: {},
