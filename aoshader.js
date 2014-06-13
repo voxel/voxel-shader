@@ -52,6 +52,7 @@ ShaderPlugin.prototype.disable = function() {
 ShaderPlugin.prototype.texturesReady = function(texture) {
   this.texture = texture; // used in tileMap uniform
 
+  /*
   this.setTestGeom(
     [{from: [0,0,0],
     to: [16,1,16],
@@ -65,6 +66,7 @@ ShaderPlugin.prototype.texturesReady = function(texture) {
       },
     texture: 'glass_blue',
     }]);
+    */
 }
 
 ShaderPlugin.prototype.setTestGeom = function(model) {
@@ -90,6 +92,8 @@ ShaderPlugin.prototype.ginit = function() {
 ShaderPlugin.prototype.updateProjectionMatrix = function() {
   mat4.perspective(this.projectionMatrix, this.cameraFOV*Math.PI/180, this.shell.width/this.shell.height, this.cameraNear, this.cameraFar)
 };
+
+var modelMatrix = mat4.create()
 
 ShaderPlugin.prototype.render = function() {
   var gl = this.shell.gl
@@ -136,15 +140,32 @@ ShaderPlugin.prototype.render = function() {
   shader2.bind()
   shader2.attributes.position.location = 0
   shader2.uniforms.view = this.viewMatrix
-  var modelMatrix = mat4.create()
+  mat4.identity(modelMatrix)
   shader2.uniforms.model = modelMatrix
   shader2.uniforms.projection = this.projectionMatrix
   if (this.texture) shader2.uniforms.texture = this.texture.bind()
 
+  // test
   if (this.customGeomTest) {
     this.customGeomTest.bind()
     this.customGeomTest.draw(gl.TRIANGLES, this.customGeomTest.length)
     this.customGeomTest.unbind()
+  }
+
+  for (var chunkIndex in this.meshes) {
+    var mesh = this.meshes[chunkIndex]
+    var blockMeshes = mesh.vertexArrayObjects.porous
+    for (var i = 0; i < blockMeshes.length; ++i) {
+      var blockMesh = blockMeshes[i];
+
+      mat4.identity(modelMatrix)
+      mat4.translate(modelMatrix, modelMatrix, blockMesh.position) // move into voxel position TODO: better way to do this? precompute/preapply matrix
+      shader2.uniforms.model = modelMatrix
+
+      blockMesh.bind()
+      blockMesh.draw(gl.TRIANGLES, blockMesh.length)
+      blockMesh.unbind()
+    }
   }
 };
 
