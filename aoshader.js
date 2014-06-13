@@ -52,9 +52,7 @@ ShaderPlugin.prototype.disable = function() {
 ShaderPlugin.prototype.texturesReady = function(texture) {
   this.texture = texture; // used in tileMap uniform
 
-  var stitcher = this.stitcher;
-
-  this.customGeomTest = createBlockGeometry(this.shell.gl,
+  this.setTestGeom(
     [{from: [0,16,0],
     to: [0,16,16], // TODO: on ground surface
     faceData: {
@@ -66,14 +64,21 @@ ShaderPlugin.prototype.texturesReady = function(texture) {
       //east: {}
       },
     texture: 'glass_blue',
-    }],
+    }]);
+}
+
+ShaderPlugin.prototype.setTestGeom = function(model) {
+  var stitcher = this.stitcher;
+  var stitcher = this.stitcher;
+  this.customGeomTest = createBlockGeometry(
+    this.shell.gl,
+    model,
     //getTextureUV:
     function(name) {
       return stitcher.getTextureUV(name); // only available when textures are ready
     }
   );
-
-}
+};
 
 ShaderPlugin.prototype.ginit = function() {
   this.shader = this.createAOShader();
