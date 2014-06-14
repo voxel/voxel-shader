@@ -76,9 +76,6 @@ ShaderPlugin.prototype.render = function() {
   gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA)
   //gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
   gl.enable(gl.BLEND)
-  // premultiply alpha when loading textures, so can use gl.ONE blending, see http://stackoverflow.com/questions/11521035/blending-with-html-background-in-webgl
-  // TODO: move to gl-texture2d?
-  gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true)
 
   //Bind the shader
   // phase 1 - solid blocks
