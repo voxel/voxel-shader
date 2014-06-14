@@ -142,7 +142,12 @@ ShaderPlugin.prototype.render = function() {
     this.customGeomTest.unbind()
   }
 
-  for (var chunkIndex in this.meshes) {
+  var keys = Object.keys(this.meshes)
+  var length = keys.length
+
+  for (var k = 0; k < length; ++k) {
+    var chunkIndex = keys[k]
+
     // phase 1 - solid blocks
     var mesh = this.meshes[chunkIndex]
     var triangleVAO = mesh.vertexArrayObjects.surface
