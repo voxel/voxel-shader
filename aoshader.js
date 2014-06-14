@@ -1,6 +1,5 @@
 var glslify = require("glslify")
 var fs = require("fs")
-var createBlockGeometry = require("block-models")
 
 var mat4 = require('gl-matrix').mat4
 
@@ -51,35 +50,7 @@ ShaderPlugin.prototype.disable = function() {
 
 ShaderPlugin.prototype.texturesReady = function(texture) {
   this.texture = texture; // used in tileMap uniform
-
-  /*
-  this.setTestGeom(
-    [{from: [0,0,0],
-    to: [16,1,16],
-    faceData: {
-      down: {},
-      up: {},
-      north: {},
-      south: {},
-      west: {},
-      east: {}
-      },
-    texture: 'glass_blue',
-    }]);
-    */
 }
-
-ShaderPlugin.prototype.setTestGeom = function(model) {
-  var stitcher = this.stitcher;
-  this.customGeomTest = createBlockGeometry(
-    this.shell.gl,
-    model,
-    //getTextureUV:
-    function(name) {
-      return stitcher.getTextureUV(name); // only available when textures are ready
-    }
-  );
-};
 
 ShaderPlugin.prototype.ginit = function() {
   this.shader = this.createAOShader();
