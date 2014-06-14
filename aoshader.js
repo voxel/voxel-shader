@@ -158,17 +158,13 @@ ShaderPlugin.prototype.render = function() {
     var chunkIndex = keys[k]
     var mesh = this.meshes[chunkIndex]
 
-    var blockMeshes = mesh.vertexArrayObjects.porous
-    if (blockMeshes) {
-      for (var i = 0; i < blockMeshes.length; ++i) {
-        var blockMesh = blockMeshes[i];
+    var blockMesh = mesh.vertexArrayObjects.porous
+    if (blockMesh) {
+      shader2.uniforms.model = this.meshes[chunkIndex].modelMatrix
 
-        shader2.uniforms.model = this.meshes[chunkIndex].modelMatrix
-
-        blockMesh.bind()
-        blockMesh.draw(gl.TRIANGLES, blockMesh.length)
-        blockMesh.unbind()
-      }
+      blockMesh.bind()
+      blockMesh.draw(gl.TRIANGLES, blockMesh.length)
+      blockMesh.unbind()
     }
   }
 };
