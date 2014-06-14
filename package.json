@@ -1,7 +1,7 @@
 {
   "name": "voxel-shader",
   "version": "0.12.0",
-  "description": "Ambient occlusion capable shader for voxel-mesher",
+  "description": "shader for voxel-mesher with ambient occulusion (voxel.js plugin)",
   "main": "aoshader.js",
   "dependencies": {
     "gl-matrix": "^2.2.1",
@@ -24,6 +24,9 @@
     "ndarray"
   ],
   "author": "Mikola Lysenko",
+  "contributors": [
+    "deathcap <deathcap@gmx.co.uk>"
+  ],
   "license": "MIT",
   "readmeFilename": "README.md",
   "bugs": {
