@@ -71,14 +71,9 @@ ShaderPlugin.prototype.render = function() {
   gl.enable(gl.CULL_FACE)
   gl.enable(gl.DEPTH_TEST)
 
-  // TODO: is this right? see https://github.com/mikolalysenko/ao-shader/issues/2
-  //gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
-  gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA)
-  //gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-  gl.enable(gl.BLEND)
-
   //Bind the shader
   // phase 1 - solid blocks
+  gl.disable(gl.BLEND)
   var shader = this.shader
   if (!shader) throw new Error('voxel-shader render() called before gl-init, shader=', this.shader)
   shader.bind()
@@ -107,6 +102,8 @@ ShaderPlugin.prototype.render = function() {
   }
 
   // phase 2 - "porous" blocks
+  gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA)  // TODO: premult alpha? https://github.com/deathcap/voxel-stitch/issues/6
+  gl.enable(gl.BLEND)
   var shader2 = this.shader2
   shader2.bind()
   shader2.attributes.position.location = 0
