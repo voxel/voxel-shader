@@ -113,6 +113,7 @@ ShaderPlugin.prototype.render = function() {
   gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true)
 
   //Bind the shader
+  // phase 1 - solid blocks
   var shader = this.shader
   if (!shader) throw new Error('voxel-shader render() called before gl-init, shader=', this.shader)
   shader.bind()
@@ -124,8 +125,23 @@ ShaderPlugin.prototype.render = function() {
 
   if (this.texture) shader.uniforms.tileMap = this.texture.bind() // if a texture is loaded
 
+  var keys = Object.keys(this.meshes)
+  var length = keys.length
 
-  // 2nd shader
+  for (var k = 0; k < length; ++k) {
+    var chunkIndex = keys[k]
+    var mesh = this.meshes[chunkIndex]
+
+    var triangleVAO = mesh.vertexArrayObjects.surface
+    if (triangleVAO) {  // if there are triangles to render
+      shader.uniforms.model = mesh.modelMatrix
+      triangleVAO.bind()
+      gl.drawArrays(gl.TRIANGLES, 0, triangleVAO.length)
+      triangleVAO.unbind()
+    }
+  }
+
+  // phase 2 - "porous" blocks
   var shader2 = this.shader2
   shader2.bind()
   shader2.attributes.position.location = 0
@@ -142,30 +158,15 @@ ShaderPlugin.prototype.render = function() {
     this.customGeomTest.unbind()
   }
 
-  var keys = Object.keys(this.meshes)
-  var length = keys.length
-
-  for (var k = 0; k < length; ++k) {
+  for (k = 0; k < length; ++k) {
     var chunkIndex = keys[k]
-
-    // phase 1 - solid blocks
     var mesh = this.meshes[chunkIndex]
-    var triangleVAO = mesh.vertexArrayObjects.surface
-    if (triangleVAO) {  // if there are triangles to render
-      shader.bind() // TODO: good idea to continuously bind and unbind for each phase, or better to render all of each phase first? bind vs iteration
-      shader.uniforms.model = mesh.modelMatrix
-      triangleVAO.bind()
-      gl.drawArrays(gl.TRIANGLES, 0, triangleVAO.length)
-      triangleVAO.unbind()
-    }
 
-    // phase 2 - porous blocks
     var blockMeshes = mesh.vertexArrayObjects.porous
     if (blockMeshes) {
       for (var i = 0; i < blockMeshes.length; ++i) {
         var blockMesh = blockMeshes[i];
 
-        shader2.bind()
         mat4.identity(modelMatrix)
         mat4.translate(modelMatrix, modelMatrix, blockMesh.position) // move into voxel position TODO: better way to do this? precompute/preapply matrix
         shader2.uniforms.model = modelMatrix
