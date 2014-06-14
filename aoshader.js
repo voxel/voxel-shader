@@ -117,13 +117,6 @@ ShaderPlugin.prototype.render = function() {
   shader2.uniforms.projection = this.projectionMatrix
   if (this.texture) shader2.uniforms.texture = this.texture.bind()
 
-  // test
-  if (this.customGeomTest) {
-    this.customGeomTest.bind()
-    this.customGeomTest.draw(gl.TRIANGLES, this.customGeomTest.length)
-    this.customGeomTest.unbind()
-  }
-
   for (k = 0; k < length; ++k) {
     var chunkIndex = keys[k]
     var mesh = this.meshes[chunkIndex]
