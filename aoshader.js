@@ -93,8 +93,6 @@ ShaderPlugin.prototype.updateProjectionMatrix = function() {
   mat4.perspective(this.projectionMatrix, this.cameraFOV*Math.PI/180, this.shell.width/this.shell.height, this.cameraNear, this.cameraFar)
 };
 
-var modelMatrix = mat4.create()
-
 ShaderPlugin.prototype.render = function() {
   var gl = this.shell.gl
 
@@ -146,8 +144,6 @@ ShaderPlugin.prototype.render = function() {
   shader2.bind()
   shader2.attributes.position.location = 0
   shader2.uniforms.view = this.viewMatrix
-  mat4.identity(modelMatrix)
-  shader2.uniforms.model = modelMatrix
   shader2.uniforms.projection = this.projectionMatrix
   if (this.texture) shader2.uniforms.texture = this.texture.bind()
 
@@ -167,9 +163,7 @@ ShaderPlugin.prototype.render = function() {
       for (var i = 0; i < blockMeshes.length; ++i) {
         var blockMesh = blockMeshes[i];
 
-        mat4.identity(modelMatrix)
-        mat4.translate(modelMatrix, modelMatrix, blockMesh.position) // move into voxel position TODO: better way to do this? precompute/preapply matrix
-        shader2.uniforms.model = modelMatrix
+        shader2.uniforms.model = this.meshes[chunkIndex].modelMatrix
 
         blockMesh.bind()
         blockMesh.draw(gl.TRIANGLES, blockMesh.length)
