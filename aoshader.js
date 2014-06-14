@@ -38,7 +38,6 @@ ShaderPlugin.prototype.enable = function() {
   this.shell.on('gl-render', this.onRender = this.render.bind(this));
   if (this.perspectiveResize) this.shell.on('gl-resize', this.onResize = this.updateProjectionMatrix.bind(this));
   this.stitcher.on('updateTexture', this.onUpdateTexture = this.texturesReady.bind(this));
-  this.stitcher.preloadTexture('glass_blue');
 };
 
 ShaderPlugin.prototype.disable = function() {
