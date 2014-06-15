@@ -73,6 +73,7 @@ ShaderPlugin.prototype.render = function() {
 
   //Bind the shader
   // phase 1 - solid blocks
+  gl.depthMask(true)
   gl.disable(gl.BLEND)
   var shader = this.shader
   if (!shader) throw new Error('voxel-shader render() called before gl-init, shader=', this.shader)
@@ -102,6 +103,7 @@ ShaderPlugin.prototype.render = function() {
   }
 
   // phase 2 - "porous" blocks
+  gl.depthMask(false)
   gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA)  // TODO: premult alpha? https://github.com/deathcap/voxel-stitch/issues/6
   gl.enable(gl.BLEND)
   var shader2 = this.shader2
