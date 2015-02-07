@@ -1,7 +1,7 @@
 var glslify = require("glslify")
 var fs = require("fs")
 
-var mat4 = require('gl-matrix').mat4
+var mat4 = require('gl-mat4')
 
 module.exports = function(game, opts) {
   return new ShaderPlugin(game, opts);
