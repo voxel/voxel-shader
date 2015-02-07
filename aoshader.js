@@ -26,7 +26,24 @@ function ShaderPlugin(game, opts) {
   this.perspectiveResize = opts.perspectiveResize !== undefined ? opts.perspectiveResize : true;
   this.cameraNear = opts.cameraNear !== undefined ? opts.cameraNear : 0.1;
   this.cameraFar = opts.cameraFar !== undefined ? opts.cameraFar : 200.0;
+
+  var self = this;
+  Object.defineProperty(this, 'cameraFOV', {
+    set: function(x) {
+           self._cameraFOV = x;
+           self.cameraFOVs = {
+             upDegrees: x,
+             downDegrees: x,
+             leftDegrees: x,
+             rightDegrees: x
+           };
+         },
+    get: function() {
+           return self._cameraFOV;
+         }
+  });
   this.cameraFOV = opts.cameraFOV !== undefined ? opts.cameraFOV : 45.0;
+  //this.cameraFOVs is the new object; this.cameraFOV for compatibility/convenience
 
   this.projectionMatrix = mat4.create();
 
@@ -59,8 +76,47 @@ ShaderPlugin.prototype.ginit = function() {
 
 };
 
+// TODO: use from mat4 https://github.com/stackgl/gl-mat4/pull/3
+/**
+ * Generates a perspective projection matrix with the given field of view.
+ * This is primarily useful for generating projection matrices to be used
+ * with the still experiemental WebVR API.
+ *
+ * @param {mat4} out mat4 frustum matrix will be written into
+ * @param {number} fov Object containing the following values: upDegrees, downDegrees, leftDegrees, rightDegrees
+ * @param {number} near Near bound of the frustum
+ * @param {number} far Far bound of the frustum
+ * @returns {mat4} out
+ */
+var perspectiveFromFieldOfView = function (out, fov, near, far) {
+    var upTan = Math.tan(fov.upDegrees * Math.PI/180.0),
+        downTan = Math.tan(fov.downDegrees * Math.PI/180.0),
+        leftTan = Math.tan(fov.leftDegrees * Math.PI/180.0),
+        rightTan = Math.tan(fov.rightDegrees * Math.PI/180.0),
+        xScale = 2.0 / (leftTan + rightTan),
+        yScale = 2.0 / (upTan + downTan);
+
+    out[0] = xScale;
+    out[1] = 0.0;
+    out[2] = 0.0;
+    out[3] = 0.0;
+    out[4] = 0.0;
+    out[5] = yScale;
+    out[6] = 0.0;
+    out[7] = 0.0;
+    out[8] = -((leftTan - rightTan) * xScale * 0.5);
+    out[9] = ((upTan - downTan) * yScale * 0.5);
+    out[10] = far / (near - far);
+    out[11] = -1.0;
+    out[12] = 0.0;
+    out[13] = 0.0;
+    out[14] = (far * near) / (near - far);
+    out[15] = 0.0;
+    return out;
+}
+
 ShaderPlugin.prototype.updateProjectionMatrix = function() {
-  mat4.perspective(this.projectionMatrix, this.cameraFOV*Math.PI/180, this.shell.width/this.shell.height, this.cameraNear, this.cameraFar)
+  perspectiveFromFieldOfView(this.projectionMatrix, this.cameraFOVs, this.cameraNear, this.cameraFar)
 };
 
 ShaderPlugin.prototype.render = function() {
