@@ -2,6 +2,8 @@ var glslify = require("glslify")
 var fs = require("fs")
 
 var mat4 = require('gl-mat4')
+var inherits = require('inherits');
+var EventEmitter = require('events').EventEmitter;
 
 module.exports = function(game, opts) {
   return new ShaderPlugin(game, opts);
@@ -32,8 +34,10 @@ function ShaderPlugin(game, opts) {
 
   this.enable();
 }
+inherits(ShaderPlugin, EventEmitter);
 
 ShaderPlugin.prototype.enable = function() {
+  this.on('updateProjectionMatrix', this.perspective.bind(this));
   this.shell.on('gl-init', this.onInit = this.ginit.bind(this));
   this.shell.on('gl-render', this.onRender = this.render.bind(this));
   if (this.perspectiveResize) this.shell.on('gl-resize', this.onResize = this.updateProjectionMatrix.bind(this));
@@ -59,8 +63,12 @@ ShaderPlugin.prototype.ginit = function() {
 
 };
 
+ShaderPlugin.prototype.perspective = function(out) {
+  mat4.perspective(out, this.cameraFOV*Math.PI/180, this.shell.width/this.shell.height, this.cameraNear, this.cameraFar)
+};
+
 ShaderPlugin.prototype.updateProjectionMatrix = function() {
-  mat4.perspective(this.projectionMatrix, this.cameraFOV*Math.PI/180, this.shell.width/this.shell.height, this.cameraNear, this.cameraFar)
+  this.emit('updateProjectionMatrix', this.projectionMatrix);
 };
 
 ShaderPlugin.prototype.render = function() {
