@@ -22,8 +22,10 @@ function ShaderPlugin(game, opts) {
   this.meshes = opts.meshes || game.voxels.meshes
   if (!this.meshes) throw new Error('voxel-shader requires "meshes" option or game.voxels.meshes set to array of voxel-mesher meshes')
 
-  this.camera = game.plugins.get('game-shell-fps-camera');
-  if (!this.camera) throw new Error('voxel-shader requires game-shell-fps-camera plugin'); // for camera view matrix
+//  this.camera = game.plugins.get('game-shell-fps-camera');
+//  if (!this.camera) throw new Error('voxel-shader requires game-shell-fps-camera plugin'); // for camera view matrix
+  this.camera = game.getCamera()
+  if (!(this.camera && this.camera.view)) throw new Error('voxel-shader requires a camera with a view matrix'); // for camera view matrix
 
   this.perspectiveResize = opts.perspectiveResize !== undefined ? opts.perspectiveResize : true;
   this.cameraNear = opts.cameraNear !== undefined ? opts.cameraNear : 0.1;
