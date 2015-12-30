@@ -19,9 +19,6 @@ mat4 translate(float x, float y, float z) { // TODO: @import glslify? same as in
                   x,   y,   z, 1.0);
 }
 
-// Offset to account for air padding (separate from other matrices so they can be reused)
-mat4 shift = translate(-1.0, -1.0, -1.0);
-
 void main() {
   //Compute position
   vec3 position = attrib0.xyz;
@@ -46,6 +43,9 @@ void main() {
   float tx    = (attrib1.z * 256.0 + attrib1.w) / tileCount; // 16-bit
   tileCoord.x = floor(tx);
   tileCoord.y = fract(tx) * tileCount;
-  
+
+  // Offset to account for air padding (separate from other matrices so they can be reused)
+  mat4 shift = translate(-1.0, -1.0, -1.0);
+
   gl_Position = projection * view * model * shift * vec4(position, 1.0);
 }
