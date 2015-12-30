@@ -1,6 +1,6 @@
 var glslify = require("glslify")
 var fs = require("fs")
-
+var glShader = require('gl-shader')
 var mat4 = require('gl-mat4')
 var inherits = require('inherits');
 var EventEmitter = require('events').EventEmitter;
@@ -140,37 +140,43 @@ ShaderPlugin.prototype.render = function() {
 };
 
 ShaderPlugin.prototype.createAOShader = function() {
-  return glslify({
-    vertex: './lib/ao.vsh',
-    fragment: './lib/ao.fsh'
-  })(this.shell.gl)
+    return glShader(this.shell.gl ,
+    glslify('./lib/ao.vsh'),
+    glslify('./lib/ao.fsh')
+    )
+  // return glslify({
+  //   vertex: './lib/ao.vsh',
+  //   fragment: './lib/ao.fsh'
+  // })(this.shell.gl)
 };
 
 ShaderPlugin.prototype.createCustomModelShader = function() {
   // TODO: refactor with voxel-decals, voxel-chunkborder?
-  return glslify({
-   inline: true,
-    vertex: "\
-attribute vec3 position;\
-attribute vec2 uv;\
-\
-uniform mat4 projection;\
-uniform mat4 view;\
-uniform mat4 model;\
-varying vec2 vUv;\
-\
-void main() {\
-  gl_Position = projection * view * model * vec4(position, 1.0);\
-  vUv = uv;\
-}",
-
-  fragment: "\
-precision highp float;\
-\
-uniform sampler2D texture;\
-varying vec2 vUv;\
-\
-void main() {\
-  gl_FragColor = texture2D(texture, vUv);\
-}"})(this.shell.gl);
+  return glShader(this.shell.gl,
+                 glslify(
+                        "\
+                        attribute vec3 position;\
+                        attribute vec2 uv;\
+                        \
+                        uniform mat4 projection;\
+                        uniform mat4 view;\
+                        uniform mat4 model;\
+                        varying vec2 vUv;\
+                        \
+                        void main() {\
+                        gl_Position = projection * view * model * vec4(position, 1.0);\
+                        vUv = uv;\
+                        }",
+                        {inline: true}),
+                glslify(
+                        "\
+                        precision highp float;\
+                        \
+                        uniform sampler2D texture;\
+                        varying vec2 vUv;\
+                        \
+                        void main() {\
+                        gl_FragColor = texture2D(texture, vUv);\
+                        }",
+                        {inline: true}));
 };
