@@ -106,7 +106,7 @@ ShaderPlugin.prototype.render = function() {
     var mesh = this.meshes[chunkIndex]
 
     var triangleVAO = mesh.vertexArrayObjects.surface
-    if (triangleVAO) {  // if there are triangles to render
+    if (triangleVAO && triangleVAO.length !== 0) {  // if there are triangles to render
       shader.uniforms.model = mesh.modelMatrix
       triangleVAO.bind()
       gl.drawArrays(gl.TRIANGLES, 0, triangleVAO.length)
@@ -129,7 +129,7 @@ ShaderPlugin.prototype.render = function() {
     var mesh = this.meshes[chunkIndex]
 
     var blockMesh = mesh.vertexArrayObjects.porous
-    if (blockMesh) {
+    if (blockMesh && blockMesh.length !== 0) {
       shader2.uniforms.model = this.meshes[chunkIndex].modelMatrix
 
       blockMesh.bind()
